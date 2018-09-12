@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////////////// //<>//
+//////////////////////////////////////////////////////////////////////////////////////////
 //
 //   Desktop GUI for controlling the HealthyPi HAT [ Patient Monitoring System]
 //
@@ -38,7 +38,8 @@ import java.text.SimpleDateFormat;
 
 // General Java Package
 import java.math.*;
-
+//import java.util.List;
+//import java.util.ArrayList;
 /************** Packet Validation  **********************/
 private static final int CESState_Init = 0;
 private static final int CESState_SOF1_Found = 1;
@@ -68,13 +69,15 @@ char ces_pkt_ecg_bytes[] = new char[4];                    // Buffer to hold ECG
 char ces_pkt_rtor_bytes[] = new char[4];                   // Respiration Buffer
 char ces_pkt_hr_bytes[] = new char[4];                // Buffer for SpO2 IR
 
-int pSize = 1500;                                            // Total Size of the buffer
+int pSize = 4000;                                            // Total Size of the buffer
 int arrayIndex = 0;                                          // Increment Variable for the buffer
 float time = 0;                                              // X axis increment variable
 
 // Buffer for ecg,spo2,respiration,and average of thos values
 float[] xdata = new float[pSize];
 float[] ecgdata = new float[pSize];
+float[] hrvdata = new float[1000*pSize];
+float[] hrvdata1 = new float[1000*pSize];
 float[] bpmArray = new float[pSize];
 float[] ecg_avg = new float[pSize];                          
 
@@ -87,6 +90,7 @@ double respirationVoltage=20;                          // To store the current r
 boolean startPlot = false;                             // Conditional Variable to start and stop the plot
 
 GPlot plotECG;
+GPlot plotHRV;
 
 int step = 0;
 int stepsPerCycle = 100;
@@ -97,6 +101,9 @@ float scale = 5;
 /************** File Related Variables **********************/
 
 boolean logging = false;                                // Variable to check whether to record the data or not
+boolean ecg_graph = false ;
+boolean hrv_graph = false ;
+
 FileWriter output;                                      // In-built writer class object to write the data to file
 JFileChooser jFileChooser;                              // Helps to choose particular folder to save the file
 Date date;                                              // Variables to record the date related values                              
@@ -124,23 +131,46 @@ public void setup()
   println(System.getProperty("os.name"));
   
   GPointsArray pointsECG = new GPointsArray(nPoints1);
-
-  size(800, 480, JAVA2D);
-  //fullScreen();
+  GPointsArray pointsHRV = new GPointsArray(nPoints1);
+  //size(1900, 1500, JAVA2D);
+  fullScreen();
   /* G4P created Methods */
   createGUI();
   customGUI();
   
-  totalPlotsHeight=height-50-68-15;
+  totalPlotsHeight=height;
 
   plotECG = new GPlot(this);
-  plotECG.setPos(0,170);
-  plotECG.setDim(width, (totalPlotsHeight*0.75)-10);
-  plotECG.setBgColor(0);
-  plotECG.setBoxBgColor(0);
+  plotECG.setPos(0,100);
+  plotECG.setDim(width, (totalPlotsHeight*0.75));
+  //plotECG.setBgColor(0);
+  //plotECG.setBoxBgColor(0);
   plotECG.setLineColor(color(0, 255, 0));
   plotECG.setLineWidth(3);
-  plotECG.setMar(0,0,0,0);
+  //plotECG.setMar(0,0,0,0);
+  
+  plotHRV = new GPlot(this);
+  //plotHRV.getXAxis().setAxisLabelText("RRn");
+  //plotHRV.getYAxis().setAxisLabelText("RRn+1");
+  plotHRV.setPos(0,100);
+  plotHRV.setDim(width, (totalPlotsHeight*0.75));
+  //plotHRV.setBgColor(0);
+  plotHRV.beginDraw();
+  plotHRV.drawBackground();
+  plotHRV.getXAxis().setAxisLabelText("RRn");
+  plotHRV.getYAxis().setAxisLabelText("RRn+1");
+  plotHRV.drawXAxis();
+  plotHRV.drawYAxis();
+  //plotHRV.activatePanning();
+  //plotHRV.setAxesOffset(500);
+  plotHRV.setTicksLength(100);
+  plotHRV.drawLines();
+  plotHRV.endDraw();
+  //plotHRV.setBoxBgColor(0);
+  plotHRV.setLineColor(color(0, 255, 0));
+
+
+  
   
   for (int i = 0; i < nPoints1; i++) 
   {
@@ -148,6 +178,15 @@ public void setup()
   }
 
   plotECG.setPoints(pointsECG);
+  
+  for (int i = 0; i < nPoints1; i++) 
+  {
+    pointsHRV.add(0,0);
+  }
+
+  plotHRV.setPoints(pointsECG);
+  plotHRV.drawXAxis();
+  plotHRV.drawYAxis();
 
   /*******  Initializing zero for buffer ****************/
 
@@ -156,12 +195,19 @@ public void setup()
     ecgdata[i] = 0;
   }
   time = 0;
+  for (int i=0; i<pSize; i++) 
+  {
+    hrvdata[i] = 0;
+    //hrvdata1[i] = 0;
+  }
 }
 
 public void draw() 
 {
-  background(0);
+  System.arraycopy(hrvdata, 1, hrvdata1,0,hrvdata.length-1);
+  //background(1);
   GPointsArray pointsECG = new GPointsArray(nPoints1);
+  GPointsArray pointsHRV = new GPointsArray(nPoints1);
 
   if (startPlot)                             // If the condition is true, then the plotting is done
   {
@@ -169,15 +215,35 @@ public void draw()
     {    
       pointsECG.add(i,ecgdata[i]);
     }
+    for(int i=0; i<nPoints1;i++)
+    {    
+      pointsHRV.add(hrvdata1[i],hrvdata[i]);
+    }
   } 
 
   plotECG.setPoints(pointsECG);
+  plotHRV.setPoints(pointsHRV);
   
-  plotECG.beginDraw();
-  plotECG.drawBackground();
-  plotECG.drawLines();
-  plotECG.endDraw();
+  if (ecg_graph){
+    plotECG.beginDraw();
+    plotECG.drawBackground();
+    plotECG.drawLines();
+    plotECG.endDraw();
+  }
+  else if (hrv_graph){
+    plotHRV.beginDraw();
+    plotHRV.drawBackground();
+    plotHRV.getXAxis().setAxisLabelText("RRn");
+    plotHRV.getYAxis().setAxisLabelText("RRn+1");
+    plotHRV.setXLim(400, 1300);
+    plotHRV.setYLim(400, 1300);
+    plotHRV.drawXAxis();
+    plotHRV.drawYAxis();
+    plotHRV.drawPoints();
+    plotHRV.endDraw();
+  }
   
+    
   pushStyle();
   noStroke();
   fill(255, 255, 255);
@@ -304,6 +370,9 @@ void pc_processData(char rxch)
         lbl_hr.setText(hr+"");
         
         ecgdata[arrayIndex] = (float)ecg;
+        hrvdata[arrayIndex] = (float)rtor_value;
+        //hrvdata1[arrayIndex] = (float)rtor_value;
+        
 
         arrayIndex++;
         
