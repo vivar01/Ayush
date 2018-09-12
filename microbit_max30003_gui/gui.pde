@@ -13,7 +13,20 @@
  * Do not rename this tab!
  * =========================================================
  */
+//////////////////////// trails //////////////////////////////// 
+public void ECG_click(GButton source, GEvent event) { //_CODE_:ECG:640355:
+  //println("ECG - GButton >> GEvent." + event + " @ " + millis());
+  ecg_graph = true;
+  hrv_graph = false ;
+  
+} //_CODE_:portList:640355: 
 
+public void HRV_click(GButton source, GEvent event) { //_CODE_:ECG:640366:
+  //println("HRV - GButton >> GEvent." + event + " @ " + millis());
+  hrv_graph = true;
+  ecg_graph = false;
+} //_CODE_:portList:640366: 
+/////////////////////////////////////////////////////////
 public void portList_click(GDropList source, GEvent event) { //_CODE_:portList:640344:
   //println("portList - GDropList >> GEvent." + event + " @ " + millis());
   selectedPort = portList.getSelectedText();
@@ -95,51 +108,61 @@ public void createGUI(){
   portList.setItems(loadStrings("list_640344"), 0);
   portList.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   portList.addEventHandler(this, "portList_click");
-  record = new GButton(this, 236, 7, 100, 40);
+  record = new GButton(this, 236, 7, 70, 40);
   record.setText("RECORD");
   record.setTextBold();
   record.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   record.addEventHandler(this, "record_click");
-  close = new GButton(this, 347, 7, 100, 40);
+  close = new GButton(this, 1800, 7, 70, 40);
   close.setText("CLOSE");
   close.setTextBold();
   close.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   close.addEventHandler(this, "close_click");
+  ECGB = new GButton(this, 850, 7, 70, 40);
+  ECGB.setText("ECG");
+  ECGB.setTextBold();
+  ECGB.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  ECGB.addEventHandler(this, "ECG_click");
+  HRVB = new GButton(this, 950, 7, 70, 40);
+  HRVB.setText("HRV");
+  HRVB.setTextBold();
+  HRVB.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  HRVB.addEventHandler(this, "HRV_click");
   //imgButton1 = new GImageButton(this, 488, 3, 277, 48, new String[] { "ayushlogo.png", "ayushlogo.png", "ayushlogo.png" } );
   
   //if full screen
   //imgButton1 = new GImageButton(this, 800, 3, 277, 48, new String[] { "logo.png", "logo.png", ".png" } );
   
   //imgButton1.addEventHandler(this, "imgButton1_click1");
-  imgButton1 = new GImageButton(this, 488, 3, 277, 48, new String[] { "logo.png", "logo.png", "logo.png" } );
-  imgButton1.addEventHandler(this, "imgButton1_click1");
-  lbl_hr = new GLabel(this, 542, 144, 250, 58);
+  //imgButton1 = new GImageButton(this, 488, 3, 277, 48, new String[] { "logo.png", "logo.png", "logo.png" } );
+  //imgButton1.addEventHandler(this, "imgButton1_click1");
+  lbl_hr = new GLabel(this, 1600, 300, 250, 62);
   lbl_hr.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   lbl_hr.setText("---");
-  lbl_hr.setTextBold();
+  //lbl_hr.setTextBold();
   lbl_hr.setOpaque(false);
-  lbl_hr.setFont(new Font("Monospaced", Font.PLAIN, 22));
-  lbl_hr.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
-  lbl_rtor = new GLabel(this, 543, 79, 250, 62);
+  lbl_hr.setFont(new Font("Monospaced", Font.PLAIN, 20));
+  //lbl_hr.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
+  lbl_rtor = new GLabel(this, 1600, 200, 250, 62);
   lbl_rtor.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   lbl_rtor.setText("---");
   lbl_rtor.setTextBold();
-  lbl_rtor.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
+  //lbl_rtor.setLocalColorScheme(GCScheme._SCHEME);
   lbl_rtor.setOpaque(false);
-  lbl_rtor.setFont(new Font("Monospaced", Font.PLAIN, 22));
-  label11 = new GLabel(this, 591, 80, 177, 20);
+  lbl_rtor.setFont(new Font("Monospaced", Font.PLAIN, 20));
+  label11 = new GLabel(this, 1600, 150, 250, 62);
   label11.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label11.setText("R - R Interval (ms)");
-  label11.setTextBold();
-  label11.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
+  //label11.setTextBold();
+  //label11.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
   label11.setOpaque(false);
-  label11.setFont(new Font("Arial", Font.PLAIN, 14));
-  label1 = new GLabel(this, 592, 145, 166, 18);
+  label11.setFont(new Font("Monospaced", Font.PLAIN, 20));
+  label1 = new GLabel(this, 1600, 250, 250, 62);
   label1.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label1.setText("Heart Rate (BPM)");
   label1.setOpaque(false);
-  label1.setFont(new Font("Monospaced", Font.PLAIN, 14));
-  label1.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
+  label1.setFont(new Font("Monospaced", Font.PLAIN, 20));
+  //label1.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
 
   /*
   lbl_hr = new GLabel(this, 1430, 180, 400, 250);
@@ -178,6 +201,8 @@ public void createGUI(){
 GDropList portList; 
 GButton record; 
 GButton close; 
+GButton ECGB;
+GButton HRVB;
 GImageButton imgButton1; 
 GLabel lbl_hr; 
 GLabel lbl_rtor; 
