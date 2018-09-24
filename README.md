@@ -11,9 +11,17 @@ The setup we are going forward with is single lead ECG compared to traditional 1
 * For software development we used [Arduino IDE](https://www.arduino.cc/en/Main/Software). We have configured IDE to support micro:bit. Refer [this](https://learn.adafruit.com/use-micro-bit-with-arduino/overview) documentation.
 * For visualizing graph, we are using [processing IDE](https://processing.org/) for now.
 
-## It's not over yet !!
 
-Stay tuned to this page :)
+
+###Stay tuned :)
+
+
+## Reference Materials
+
+* [ECG Biometrics](https://www.researchgate.net/publication/271386679/download)
+* [Heart Rate Variability](https://www.researchgate.net/publication/271386679/download)
+* [Deep Learning Approach for Active Classification of Electrocardiogram Signals](https://www.researchgate.net/publication/293174514_Deep_Learning_Approach_for_Active_Classification_of_Electrocardiogram_Signals?enrichId=rgreq-2e8f274359ced6036ca47df5bd75362d-XXX&enrichSource=Y292ZXJQYWdlOzI5MzE3NDUxNDtBUzozNDU2MDUzNjE2ODQ0ODRAMTQ1OTQxMDE0NzUyNw%3D%3D&el=1_x_2&_esc=publicationCoverPdf)
+
 
 <!--
 ### Prerequisites
